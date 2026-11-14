@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * C2S [1, 0] = rotate the group for the server-selected hotbar slot.
  * S2C [2, activeIndex] = rotation accepted.
  * S2C [3, 0] = permission denied.
+ * S2C [4, 0] = no other non-empty cell is available.
  */
 public final class HotbarCyclingPlugin extends JavaPlugin implements Listener, PluginMessageListener {
     public static final String CHANNEL = "hotbarcycling:main";
@@ -29,6 +30,7 @@ public final class HotbarCyclingPlugin extends JavaPlugin implements Listener, P
     private static final byte OP_ROTATE = 1;
     private static final byte OP_ACK = 2;
     private static final byte OP_REJECT = 3;
+    private static final byte OP_NO_ITEMS = 4;
     private static final long MIN_REQUEST_INTERVAL_NANOS = 75_000_000L;
 
     private final Map<UUID, PlayerHotbarData> sessions = new ConcurrentHashMap<>();
@@ -50,7 +52,7 @@ public final class HotbarCyclingPlugin extends JavaPlugin implements Listener, P
             sessions.put(player.getUniqueId(), dataManager.load(player.getUniqueId()));
         }
 
-        getLogger().info("HotbarCycling 0.2.0 enabled on " + CHANNEL);
+        getLogger().info("HotbarCycling 0.3.0 enabled on " + CHANNEL);
     }
 
     @Override
@@ -100,9 +102,13 @@ public final class HotbarCyclingPlugin extends JavaPlugin implements Listener, P
         PlayerHotbarData data = sessions.computeIfAbsent(
                 player.getUniqueId(), id -> dataManager.load(id));
 
-        inventoryManager.rotateSelectedGroup(player, data);
-        int activeIndex = data.getGroup(player.getInventory().getHeldItemSlot()).getActiveIndex();
-        sendReply(player, OP_ACK, activeIndex);
+        boolean rotated = inventoryManager.rotateSelectedGroup(player, data);
+        if (rotated) {
+            int activeIndex = data.getGroup(player.getInventory().getHeldItemSlot()).getActiveIndex();
+            sendReply(player, OP_ACK, activeIndex);
+        } else {
+            sendReply(player, OP_NO_ITEMS, 0);
+        }
     }
 
     private void sendReply(Player player, byte opcode, int value) {
@@ -124,9 +130,13 @@ public final class HotbarCyclingPlugin extends JavaPlugin implements Listener, P
                 player.getUniqueId(), id -> dataManager.load(id));
 
         if (args.length == 1 && args[0].equalsIgnoreCase("rotate")) {
-            inventoryManager.rotateSelectedGroup(player, data);
-            player.sendMessage(ChatColor.GREEN + "Rotated group for hotbar slot "
-                    + (player.getInventory().getHeldItemSlot() + 1) + ".");
+            boolean rotated = inventoryManager.rotateSelectedGroup(player, data);
+            if (rotated) {
+                player.sendMessage(ChatColor.GREEN + "Rotated group for hotbar slot "
+                        + (player.getInventory().getHeldItemSlot() + 1) + ".");
+            } else {
+                player.sendMessage(ChatColor.YELLOW + "No other non-empty item in this group.");
+            }
             return true;
         }
 

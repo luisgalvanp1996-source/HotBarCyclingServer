@@ -48,6 +48,10 @@ public final class HotbarCyclingClient implements ClientModInitializer {
                         player.sendSystemMessage(Component.literal(
                                 "Hotbar Cycling: no tienes permiso para usarlo."
                         ));
+                    } else if (payload.opcode() == 4) {
+                        player.sendSystemMessage(Component.literal(
+                                "Hotbar Cycling: no hay otro objeto en este grupo."
+                        ));
                     }
                 }
         );

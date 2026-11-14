@@ -16,7 +16,7 @@ public final class HotbarGroup {
     public ItemStack get(int index) {
         checkIndex(index);
         ItemStack item = items[index];
-        return item == null ? null : item.clone();
+        return isEmpty(item) ? null : item.clone();
     }
 
     public void set(int index, ItemStack item) {
@@ -33,8 +33,20 @@ public final class HotbarGroup {
         this.activeIndex = activeIndex;
     }
 
-    public int nextIndex() {
-        return (activeIndex + 1) % SIZE;
+    /**
+     * Finds the next occupied virtual cell, wrapping around the 3x3 group.
+     * The currently active cell is deliberately excluded because its item
+     * lives in the player's real hotbar slot, not in virtual storage.
+     * Returns -1 when no other item is available.
+     */
+    public int nextOccupiedIndex() {
+        for (int step = 1; step < SIZE; step++) {
+            int candidate = (activeIndex + step) % SIZE;
+            if (!isEmpty(items[candidate])) {
+                return candidate;
+            }
+        }
+        return -1;
     }
 
     private static boolean isEmpty(ItemStack item) {

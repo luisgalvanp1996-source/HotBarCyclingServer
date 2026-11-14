@@ -8,7 +8,8 @@ import net.minecraft.resources.Identifier;
 /**
  * Two-byte protocol shared with Paper:
  * C2S [1, 0] = rotate the server-side group for the selected hotbar slot.
- * S2C [2, activeIndex] = rotation accepted; [3, 0] = permission denied.
+ * S2C [2, activeIndex] = rotation accepted; [3, 0] = permission denied;
+ * S2C [4, 0] = no other non-empty cell is available.
  */
 public record HotbarCyclingPayload(int opcode, int value) implements CustomPacketPayload {
     public static final Identifier ID =

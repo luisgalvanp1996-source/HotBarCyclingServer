@@ -15,17 +15,27 @@ public final class InventoryManager {
         this.dataManager = dataManager;
     }
 
+    /**
+     * Moves to the next non-empty virtual cell, skipping null/empty cells.
+     * Returns false without changing anything if there is no other item.
+     */
     public boolean rotateSelectedGroup(Player player, PlayerHotbarData data) {
         int hotbarSlot = player.getInventory().getHeldItemSlot();
         HotbarGroup group = data.getGroup(hotbarSlot);
 
         int activeIndex = group.getActiveIndex();
-        int nextIndex = group.nextIndex();
+        int nextIndex = group.nextOccupiedIndex();
+
+        // Find a destination before changing anything. This keeps the currently
+        // held item untouched when every other virtual cell is empty.
+        if (nextIndex < 0) {
+            return false;
+        }
 
         ItemStack current = cloneOrNull(player.getInventory().getItem(hotbarSlot));
         ItemStack next = group.get(nextIndex);
 
-        // Return the currently held stack to its virtual cell.
+        // Return the held stack to its previous virtual cell.
         group.set(activeIndex, current);
 
         // Remove the next stack from virtual storage before placing it in the hotbar.
