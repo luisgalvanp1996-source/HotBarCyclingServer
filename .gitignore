@@ -1,0 +1,75 @@
+
+# ==========================================
+# Gradle - ambos proyectos
+# ==========================================
+.gradle/
+**/.gradle/
+**/build/
+**/out/
+**/target/
+
+# ==========================================
+# Java compilado
+# ==========================================
+*.class
+*.jar
+*.war
+*.ear
+
+# ==========================================
+# IDEs y editores
+# ==========================================
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+
+# ==========================================
+# Sistema operativo
+# ==========================================
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# ==========================================
+# Logs y archivos temporales
+# ==========================================
+*.log
+*.tmp
+*.temp
+*.bak
+*.old
+*.swp
+*.swo
+hs_err_pid*
+replay_pid*
+
+# ==========================================
+# Configuración local / secretos
+# ==========================================
+.env
+.env.*
+!.env.example
+secrets/
+*.keystore
+*.jks
+
+# ==========================================
+# Archivos de configuración locales
+# ==========================================
+local.properties
+
+# ==========================================
+# Archivos de respaldo
+# ==========================================
+*.zip
+*.7z
+*.rar
+*.tar
+*.gz
+*.backup

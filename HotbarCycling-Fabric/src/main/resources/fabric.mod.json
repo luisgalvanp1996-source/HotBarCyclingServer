@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "hotbarcycling",
+  "version": "${version}",
+  "name": "Hotbar Cycling",
+  "description": "Server-backed nine-group hotbar item cycling.",
+  "authors": [
+    "Server404"
+  ],
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "dev.server404.hotbar.HotbarCyclingClient"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "minecraft": "26.2",
+    "java": ">=25",
+    "fabric-api": ">=0.161.0+26.2"
+  }
+}

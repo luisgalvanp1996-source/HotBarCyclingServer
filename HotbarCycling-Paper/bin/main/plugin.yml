@@ -1,0 +1,15 @@
+name: HotbarCycling
+version: '${version}'
+main: dev.server404.hotbar.HotbarCyclingPlugin
+api-version: '26.2'
+description: Nine persistent cycling groups for each player's hotbar.
+author: Server404
+commands:
+  hotbarcycling:
+    description: Hotbar Cycling test and status commands
+    aliases: [hc]
+    usage: /hc <status|rotate>
+permissions:
+  hotbarcycling.use:
+    description: Allows use of Hotbar Cycling
+    default: true
