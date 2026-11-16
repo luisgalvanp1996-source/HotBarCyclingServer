@@ -34,14 +34,13 @@ public final class HotbarGroup {
     }
 
     /**
-     * Finds the next occupied virtual cell, wrapping around the 3x3 group.
-     * The currently active cell is deliberately excluded because its item
-     * lives in the player's real hotbar slot, not in virtual storage.
-     * Returns -1 when no other item is available.
+     * Finds the next occupied virtual cell, wrapping around the group.
+     * Returns -1 if no other occupied cell exists.
      */
-    public int nextOccupiedIndex() {
+    public int nextOccupiedIndex(boolean reverse) {
+        int direction = reverse ? -1 : 1;
         for (int step = 1; step < SIZE; step++) {
-            int candidate = (activeIndex + step) % SIZE;
+            int candidate = Math.floorMod(activeIndex + direction * step, SIZE);
             if (!isEmpty(items[candidate])) {
                 return candidate;
             }

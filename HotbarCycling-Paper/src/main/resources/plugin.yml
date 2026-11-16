@@ -6,9 +6,9 @@ description: Nine persistent cycling groups for each player's hotbar.
 author: Server404
 commands:
   hotbarcycling:
-    description: Hotbar Cycling test and status commands
+    description: Hotbar Cycling test, status and settings commands
     aliases: [hc]
-    usage: /hc <status|rotate>
+    usage: /hc <status|rotate|settings>
 permissions:
   hotbarcycling.use:
     description: Allows use of Hotbar Cycling

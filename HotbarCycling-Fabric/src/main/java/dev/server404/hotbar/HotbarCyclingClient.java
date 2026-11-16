@@ -10,6 +10,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
+
 public final class HotbarCyclingClient implements ClientModInitializer {
     private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(
             Identifier.fromNamespaceAndPath("hotbarcycling", "main")
@@ -48,31 +49,31 @@ public final class HotbarCyclingClient implements ClientModInitializer {
                         player.sendSystemMessage(Component.literal(
                                 "Hotbar Cycling: no tienes permiso para usarlo."
                         ));
-                    } else if (payload.opcode() == 4) {
-                        player.sendSystemMessage(Component.literal(
-                                "Hotbar Cycling: no hay otro objeto en este grupo."
-                        ));
                     }
                 }
         );
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (ROTATE_KEY.consumeClick()) {
-                if (client.player == null || client.level == null || client.gui.screen() != null) {
-                    continue;
-                }
+    while (ROTATE_KEY.consumeClick()) {
+        if (client.player == null || client.level == null || client.gui.screen() != null) {
+            continue;
+        }
 
-                if (!ClientPlayNetworking.canSend(HotbarCyclingPayload.TYPE)) {
-                    client.player.sendSystemMessage(Component.literal(
-                            "Hotbar Cycling: el servidor no anuncia el canal del plugin."
-                    ));
-                    continue;
-                }
+        if (!ClientPlayNetworking.canSend(HotbarCyclingPayload.TYPE)) {
+            client.player.sendSystemMessage(Component.literal(
+                    "Hotbar Cycling: el servidor no anuncia el canal del plugin."
+            ));
+            continue;
+        }
 
-                // The client does not send a slot number. Paper reads the
-                // currently selected slot from its authoritative player inventory.
-                ClientPlayNetworking.send(new HotbarCyclingPayload(1, 0));
-            }
-        });
+        if (client.options.keyShift.isDown()) {
+            // Shift + G: abrir editor del grupo seleccionado.
+            ClientPlayNetworking.send(new HotbarCyclingPayload(5, 0));
+        } else {
+            // G: rotación inteligente.
+            ClientPlayNetworking.send(new HotbarCyclingPayload(1, 0));
+        }
+    }
+});
     }
 }

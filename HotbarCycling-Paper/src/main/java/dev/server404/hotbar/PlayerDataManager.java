@@ -11,7 +11,7 @@ import java.util.Base64;
 import java.util.UUID;
 import java.util.logging.Level;
 
-/** Stores each player's virtual groups in a separate UUID-named YAML file. */
+/** Stores each player's virtual groups and preferences in a UUID-named YAML file. */
 public final class PlayerDataManager {
     private final JavaPlugin plugin;
     private final File playerFolder;
@@ -30,6 +30,12 @@ public final class PlayerDataManager {
         if (!file.exists()) return data;
 
         YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
+
+        data.setSkipEmpty(yaml.getBoolean("settings.skip-empty", true));
+        data.setReverseRotation(yaml.getBoolean("settings.reverse-rotation", false));
+        data.setEditorOpen(yaml.getBoolean("editor.open", false),
+                yaml.getInt("editor.hotbar-slot", -1));
+
         for (int groupIndex = 0; groupIndex < 9; groupIndex++) {
             String path = "groups." + groupIndex;
             ConfigurationSection section = yaml.getConfigurationSection(path);
@@ -55,6 +61,11 @@ public final class PlayerDataManager {
 
     public void save(PlayerHotbarData data) {
         YamlConfiguration yaml = new YamlConfiguration();
+
+        yaml.set("settings.skip-empty", data.isSkipEmpty());
+        yaml.set("settings.reverse-rotation", data.isReverseRotation());
+        yaml.set("editor.open", data.isEditorOpen());
+        yaml.set("editor.hotbar-slot", data.getEditorHotbarSlot());
 
         for (int groupIndex = 0; groupIndex < 9; groupIndex++) {
             HotbarGroup group = data.getGroup(groupIndex);

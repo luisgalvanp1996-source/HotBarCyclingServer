@@ -4,8 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 /**
- * Rotates the virtual 3x3 group associated with the currently selected hotbar slot.
- * The currently active virtual cell is represented by the real hotbar slot.
+ * Rotates the virtual group associated with the selected hotbar slot.
  * All inventory operations must run on Paper's main server thread.
  */
 public final class InventoryManager {
@@ -15,19 +14,20 @@ public final class InventoryManager {
         this.dataManager = dataManager;
     }
 
-    /**
-     * Moves to the next non-empty virtual cell, skipping null/empty cells.
-     * Returns false without changing anything if there is no other item.
-     */
     public boolean rotateSelectedGroup(Player player, PlayerHotbarData data) {
         int hotbarSlot = player.getInventory().getHeldItemSlot();
         HotbarGroup group = data.getGroup(hotbarSlot);
 
         int activeIndex = group.getActiveIndex();
-        int nextIndex = group.nextOccupiedIndex();
+        int nextIndex;
 
-        // Find a destination before changing anything. This keeps the currently
-        // held item untouched when every other virtual cell is empty.
+        if (data.isSkipEmpty()) {
+            nextIndex = group.nextOccupiedIndex(data.isReverseRotation());
+        } else {
+            int direction = data.isReverseRotation() ? -1 : 1;
+            nextIndex = Math.floorMod(activeIndex + direction, HotbarGroup.SIZE);
+        }
+
         if (nextIndex < 0) {
             return false;
         }
@@ -35,10 +35,7 @@ public final class InventoryManager {
         ItemStack current = cloneOrNull(player.getInventory().getItem(hotbarSlot));
         ItemStack next = group.get(nextIndex);
 
-        // Return the held stack to its previous virtual cell.
         group.set(activeIndex, current);
-
-        // Remove the next stack from virtual storage before placing it in the hotbar.
         group.set(nextIndex, null);
         player.getInventory().setItem(hotbarSlot, cloneOrNull(next));
         group.setActiveIndex(nextIndex);
