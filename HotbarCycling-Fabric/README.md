@@ -1,33 +1,27 @@
-# Hotbar Cycling — Fabric Client 0.1.0
+# Hotbar Cycling — Fabric Client 0.4.0
 
 **Target client**
 - Minecraft 26.2
-- Fabric Loader 0.19.5
+- Fabric Loader 0.19.5+
 - Fabric API 0.161.0+26.2
 - Java 25
-- Fabric Loom 1.17.21
-- Gradle 9.6.1 or newer
+- Mod Menu 20.0.3 (optional, recommended)
 
-## Implemented in this slice
-- Client-only Fabric mod.
-- Configurable key mapping under Options > Controls > Hotbar Cycling.
-- Default key: G.
-- Sends the two-byte rotate request over `hotbarcycling:main`.
-- Displays the Paper acknowledgement or permission rejection.
-- Does not modify inventory locally; Paper remains authoritative.
+## Features
+- `G`: rotate the selected virtual group.
+- `Shift + G`: open the selected group's 3x3 editor.
+- Config screen exposed through Mod Menu's gear/config button.
+- Local settings saved in `.minecraft/config/hotbarcycling.properties`.
+- Key mapping `G` is saved by Minecraft in `options.txt`; Shift remains the fixed modifier.
+- Client preferences are synchronized to Paper when joining and when changed in the config screen.
 
 ## Build
-Use JDK 25 and Gradle 9.6.1 or newer:
+From this folder with JDK 25 and Gradle 9.6.1+:
 
 ```powershell
-gradle build
+gradle clean build
 ```
 
-Output: `build/libs/HotbarCycling-Fabric-0.1.0.jar`
+Output: `build/libs/HotbarCycling-Fabric-0.4.0.jar`
 
-## Install
-Copy the JAR into the Fabric client's `mods` folder. Keep Fabric API 0.161.0+26.2 installed.
-The matching Paper plugin 0.2.0 must be installed on the server.
-
-## Not implemented yet
-The 3x3 editor, group/item synchronization, and GUI-based per-group settings are the next stage.
+Mod Menu is a compile-only integration and is not a hard dependency. Without Mod Menu, the keybind and local config still work; settings can be edited through Mod Menu when installed.

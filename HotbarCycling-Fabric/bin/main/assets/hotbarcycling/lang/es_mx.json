@@ -1,4 +1,12 @@
 {
   "key.category.hotbarcycling.main": "Hotbar Cycling",
-  "key.hotbarcycling.rotate": "Rotar grupo (Shift+G abre editor)"
+  "key.hotbarcycling.rotate": "Rotar grupo (Shift+G abre editor)",
+  "modmenu.nameTranslation.hotbarcycling": "Hotbar Cycling",
+  "modmenu.descriptionTranslation.hotbarcycling": "Grupos de hotbar sincronizados con el servidor y configuración local.",
+  "screen.hotbarcycling.config.title": "Configuración de Hotbar Cycling",
+  "screen.hotbarcycling.config.skip_empty": "Saltar espacios vacíos: %s",
+  "screen.hotbarcycling.config.reverse": "Dirección de rotación: %s",
+  "screen.hotbarcycling.config.forward": "Adelante",
+  "screen.hotbarcycling.config.backward": "Atrás",
+  "screen.hotbarcycling.config.controls": "Configurar teclas (G / Shift + G)"
 }

@@ -7,7 +7,7 @@ import net.minecraft.resources.Identifier;
 
 /**
  * Two-byte protocol shared with Paper:
- * C2S [1,0] = rotate selected group; C2S [5,0] = open 3x3 editor.
+ * C2S [1,0] = rotate selected group; C2S [5,0] = open 3x3 editor; C2S [6,flags] = sync client preferences.
  * S2C [2,index] = rotation accepted; [3,0] = permission denied;
  * [4,0] = no other non-empty cell is available.
  */

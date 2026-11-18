@@ -42,6 +42,7 @@ public final class HotbarCyclingPlugin extends JavaPlugin implements Listener, P
     private static final byte OP_REJECT = 3;
     private static final byte OP_NO_ITEMS = 4;
     private static final byte OP_OPEN_EDITOR = 5;
+    private static final byte OP_SET_SETTINGS = 6;
     private static final long MIN_REQUEST_INTERVAL_NANOS = 75_000_000L;
 
     private final Map<UUID, PlayerHotbarData> sessions = new ConcurrentHashMap<>();
@@ -65,7 +66,7 @@ public final class HotbarCyclingPlugin extends JavaPlugin implements Listener, P
             recoverInterruptedEditor(player, data);
         }
 
-        getLogger().info("HotbarCycling 0.3.0 enabled on " + CHANNEL);
+        getLogger().info("HotbarCycling " + getDescription().getVersion() + " enabled on " + CHANNEL);
     }
 
     @Override
@@ -104,6 +105,19 @@ public final class HotbarCyclingPlugin extends JavaPlugin implements Listener, P
     @Override
     public void onPluginMessageReceived(String channel, Player player, byte[] message) {
         if (!CHANNEL.equals(channel) || message == null || message.length != 2) return;
+
+        // Client-local preferences are synchronized on join and whenever the Mod Menu screen changes them.
+        if (message[0] == OP_SET_SETTINGS) {
+            int flags = message[1] & 0xFF;
+            if (flags > 3 || !player.hasPermission("hotbarcycling.use")) return;
+            PlayerHotbarData settingsData = sessions.computeIfAbsent(
+                    player.getUniqueId(), id -> dataManager.load(id));
+            settingsData.setSkipEmpty((flags & 1) != 0);
+            settingsData.setReverseRotation((flags & 2) != 0);
+            dataManager.save(settingsData);
+            return;
+        }
+
         if (message[1] != 0) return;
         if (message[0] != OP_ROTATE && message[0] != OP_OPEN_EDITOR) return;
 

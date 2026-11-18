@@ -10,8 +10,9 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
-
 public final class HotbarCyclingClient implements ClientModInitializer {
+    private static boolean settingsSynced;
+
     private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(
             Identifier.fromNamespaceAndPath("hotbarcycling", "main")
     );
@@ -27,6 +28,8 @@ public final class HotbarCyclingClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        HotbarCyclingConfig.load();
+
         PayloadTypeRegistry.serverboundPlay().register(
                 HotbarCyclingPayload.TYPE, HotbarCyclingPayload.CODEC
         );
@@ -54,26 +57,40 @@ public final class HotbarCyclingClient implements ClientModInitializer {
         );
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-    while (ROTATE_KEY.consumeClick()) {
-        if (client.player == null || client.level == null || client.gui.screen() != null) {
-            continue;
-        }
+            if (client.player == null || client.level == null) {
+                settingsSynced = false;
+            } else if (!settingsSynced && ClientPlayNetworking.canSend(HotbarCyclingPayload.TYPE)) {
+                syncSettings();
+            }
 
-        if (!ClientPlayNetworking.canSend(HotbarCyclingPayload.TYPE)) {
-            client.player.sendSystemMessage(Component.literal(
-                    "Hotbar Cycling: el servidor no anuncia el canal del plugin."
-            ));
-            continue;
-        }
+            while (ROTATE_KEY.consumeClick()) {
+                if (client.player == null || client.level == null || client.gui.screen() != null) {
+                    continue;
+                }
 
-        if (client.options.keyShift.isDown()) {
-            // Shift + G: abrir editor del grupo seleccionado.
-            ClientPlayNetworking.send(new HotbarCyclingPayload(5, 0));
-        } else {
-            // G: rotación inteligente.
-            ClientPlayNetworking.send(new HotbarCyclingPayload(1, 0));
-        }
+                if (!ClientPlayNetworking.canSend(HotbarCyclingPayload.TYPE)) {
+                    client.player.sendSystemMessage(Component.literal(
+                            "Hotbar Cycling: el servidor no anuncia el canal del plugin."
+                    ));
+                    continue;
+                }
+
+                if (client.options.keyShift.isDown()) {
+                    // Shift + G: open the editor for the selected hotbar group.
+                    ClientPlayNetworking.send(new HotbarCyclingPayload(5, 0));
+                } else {
+                    // G: rotate the selected group.
+                    ClientPlayNetworking.send(new HotbarCyclingPayload(1, 0));
+                }
+            }
+        });
     }
-});
+
+    /** Sends the client-local preferences to Paper. */
+    public static void syncSettings() {
+        if (ClientPlayNetworking.canSend(HotbarCyclingPayload.TYPE)) {
+            ClientPlayNetworking.send(new HotbarCyclingPayload(6, HotbarCyclingConfig.flags()));
+            settingsSynced = true;
+        }
     }
 }
